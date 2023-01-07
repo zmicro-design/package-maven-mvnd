@@ -22,7 +22,7 @@ install() {
     fi
     ;;
   linux)
-    if [ "$arch" = "amd64" ]; then
+    if [ "$arch" != "amd64" ]; then
       log::error "[$(timestmp)] unsupport arch: $arch"
       return 1
     fi
