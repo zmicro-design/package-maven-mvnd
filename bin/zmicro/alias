@@ -20,8 +20,12 @@ help() {
 }
 
 version() {
-  # mvnd --version
-  echo "v1.0.0-m1"
+  if [ -z "$JAVA_HOME" ] || [ -z "$MAVEN_HOME" ] || [ -z "$MVND_HOME" ]; then
+    echo "v1.0.0-m1"
+    return 0
+  fi
+
+  mvnd --version
 }
 
 core() {
