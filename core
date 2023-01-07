@@ -1,0 +1,82 @@
+#!/bin/bash
+
+install() {
+  # prepare vars
+  local name="$PACKAGE_CORE_NAME"
+
+  log::info "[$(timestamp)][package][$name] preparing ..."
+
+  # get system os/arch
+  local arch="$PACKAGE_OS_ARCH"
+  local kernel="$PACKAGE_OS_KERNEL"
+  local platform="$PACKAGE_OS_PLATFORM"
+  # usr_bin_dir
+  local usr_bin_dir="$PACKAGE_USER_BIN_DIR"
+  local usr_lib_dir="$PACKAGE_USER_LIB_DIR"
+  local tmp_dir="$PACKAGE_TMP_DIR"
+
+  case $platform in
+  darwin)
+    if [ "$arch" = "arm64" ]; then
+      arch="aarch64"
+    fi
+    ;;
+  linux)
+    if [ "$arch" = "amd64" ]; then
+      log::error "[$(timestmp)] unsupport arch: $arch"
+      return 1
+    fi
+    ;;
+  *)
+    log::error "[$(timestmp)] unsupport platform: $platform"
+    return 1
+    ;;
+  esac
+
+  # files
+  local tmp_file="$name.tar.gz"
+  local lib_dir="./${name}-${PACKAGE_CORE_VERSION#v}-${platform}-${arch}"
+  local bin_file="${lib_dir}/bin/$PACKAGE_CORE_BIN_NAME"
+
+  # prepare context
+  cd $tmp_dir
+
+  # reference: https://github.com/apache/maven-mvnd/releases
+  # example:
+  #   https://github.com/apache/maven-mvnd/releases/download/1.0.0-m1/maven-mvnd-1.0.0-m1-darwin-amd64.tar.gz
+  #   https://github.com/apache/maven-mvnd/releases/download/1.0.0-m1/maven-mvnd-1.0.0-m1-darwin-aarch64.tar.gz
+  #   https://github.com/apache/maven-mvnd/releases/download/1.0.0-m1/maven-mvnd-1.0.0-m1-linux-amd64.tar.gz
+  # generate url
+  local url="${PACKAGE_CORE_RELEASE_DOWNLOAD}/${PACKAGE_CORE_VERSION#v}/${name}-${PACKAGE_CORE_VERSION#v}-${platform}-${arch}.tar.gz"
+  log::debug "[$(timestamp)][package][$name][$kernel][$arch] url: $url, file: ${tmp_file}, tmp_dir: $tmp_dir"
+
+  # download
+  log::info "[$(timestamp)][package][$name] downloading ..."
+  os::download $tmp_file $url
+
+  # extract
+  log::info "[$(timestamp)][package][$name] extracting ..."
+  os::extract $tmp_file
+
+  # make executable
+  log::info "[$(timestamp)][package][$name] making executable ..."
+  chmod 755 $bin_file
+
+  # install
+  if [ -d "$usr_local_lib/${name}" ]; then
+    log::info "[$(timestamp)][package][$name] removing old lib ..."
+    sudo rm -rf $usr_local_lib/${name}
+  fi
+  log::info "[$(timestamp)][package][$name] installing lib ..."
+  sudo mv $lib_dir $usr_local_lib/${name}
+
+  # install
+  log::info "[$(timestamp)][package][$name] installing bin ..."
+  sudo ln -sf $usr_local_lib/${name}/bin/${PACKAGE_CORE_BIN_NAME} $usr_bin_dir/${PACKAGE_CORE_BIN_NAME}
+
+  # clean
+  log::info "[$(timestamp)][package][$name] cleaning ..."
+  rm -rf $tmp_dir
+}
+
+export -f install
