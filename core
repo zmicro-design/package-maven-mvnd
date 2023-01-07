@@ -63,16 +63,16 @@ install() {
   chmod 755 $bin_file
 
   # install
-  if [ -d "$usr_local_lib/${name}" ]; then
+  if [ -d "$usr_lib_dir/${name}" ]; then
     log::info "[$(timestamp)][package][$name] removing old lib ..."
-    sudo rm -rf $usr_local_lib/${name}
+    sudo rm -rf $usr_lib_dir/${name}
   fi
   log::info "[$(timestamp)][package][$name] installing lib ..."
-  sudo mv $lib_dir $usr_local_lib/${name}
+  sudo mv $lib_dir $usr_lib_dir/${name}
 
   # install
   log::info "[$(timestamp)][package][$name] installing bin ..."
-  sudo ln -sf $usr_local_lib/${name}/bin/${PACKAGE_CORE_BIN_NAME} $usr_bin_dir/${PACKAGE_CORE_BIN_NAME}
+  sudo ln -sf $usr_lib_dir/${name}/bin/${PACKAGE_CORE_BIN_NAME} $usr_bin_dir/${PACKAGE_CORE_BIN_NAME}
 
   # clean
   log::info "[$(timestamp)][package][$name] cleaning ..."
