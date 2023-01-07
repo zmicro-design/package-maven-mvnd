@@ -1,4 +1,4 @@
 NAME=maven-mvnd
-VERSION=v0.0.1
+VERSION=v1.0.0
 MODULE=package
 DESCRIPTION="Highly opinionated MTPROTO proxy for Telegram"
