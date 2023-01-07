@@ -5,11 +5,23 @@ help() {
   echo "  zmicro maven-mvnd <args ...>"
   echo ""
 
+  if [ -z "$JAVA_HOME" ]; then
+    log::info "You should set env JAVA_HOME"
+    return 0
+  elif [ -z "$MAVEN_HOME" ]; then
+    log::info "You should set env MAVEN_HOME"
+    return 0
+  elif [ -z "$MVND_HOME" ]; then
+    log::info "You should set env MVND_HOME"
+    return 0
+  fi
+
   mvnd --help
 }
 
 version() {
-  mvnd --version
+  # mvnd --version
+  echo "v1.0.0-m1"
 }
 
 core() {

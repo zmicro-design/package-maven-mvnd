@@ -74,6 +74,15 @@ install() {
   log::info "[$(timestamp)][package][$name] installing bin ..."
   sudo ln -sf $usr_lib_dir/${name}/bin/${PACKAGE_CORE_BIN_NAME} $usr_bin_dir/${PACKAGE_CORE_BIN_NAME}
 
+  # profile
+  log::success "[$(timestamp)][package][$name] config MVND_HOME=$usr_lib_dir/${name} to global env file ..."
+  local envs=$(
+    cat <<-END
+export MVND_HOME=$usr_lib_dir/${name}
+END
+)
+  config::profile "# ZMICRO PACKAGE MAVEN-MVND" "$envs"
+
   # clean
   log::info "[$(timestamp)][package][$name] cleaning ..."
   rm -rf $tmp_dir
